@@ -54,7 +54,6 @@ public class HomeActivity extends Activity {
             int columns;
     boolean connected = true;
     private boolean monitoringConnectivity = false;
-    private TextView noFiltersEmptyText;
     FeedAdapter adapter;
     DataManager dataManager;
     private MyFlipAnimator mChangeAnimator = new MyFlipAnimator();
@@ -78,16 +77,6 @@ public class HomeActivity extends Activity {
         layoutManager = new GridLayoutManager(this, columns);
         grid.setLayoutManager(layoutManager);
         grid.setItemAnimator(mChangeAnimator);
-
-        /*
-       TODO LoadMore Function for infinite scrolling
-       grid.addOnScrollListener(new InfiniteScrollListener(layoutManager, dataManager) {
-            @Override
-            public void onLoadMore() {
-                dataManager.loadDataSource();
-            }
-        });*/
-
         grid.addItemDecoration(new SimpleDividerItemDecoration(8, 8));
         grid.setHasFixedSize(true);
         grid.setAdapter(adapter);
@@ -105,14 +94,12 @@ public class HomeActivity extends Activity {
 
                 // inset the grid top by statusbar+toolbar & the bottom by the navbar (don't clip)
                 grid.setPadding(
-                        grid.getPaddingLeft() + insets.getSystemWindowInsetLeft(), // landscape
+                        0,
                         insets.getSystemWindowInsetTop()
                                 + ViewUtils.getActionBarSize(HomeActivity.this),
-                        grid.getPaddingRight() + insets.getSystemWindowInsetRight(), // landscape
+                        0,
                         grid.getPaddingBottom() + insets.getSystemWindowInsetBottom());
 
-                // we place a background behind the status bar to combine with it's semi-transparent
-                // color to get the desired appearance.  Set it's height to the status bar height
                 View statusBarBackground = findViewById(R.id.status_bar_background);
                 FrameLayout.LayoutParams lpStatus = (FrameLayout.LayoutParams)
                         statusBarBackground.getLayoutParams();

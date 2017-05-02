@@ -1,22 +1,13 @@
 package com.vixir.flipr.ui;
 
-import android.animation.Animator;
-import android.animation.AnimatorInflater;
-import android.animation.AnimatorListenerAdapter;
-import android.animation.AnimatorSet;
-import android.animation.ObjectAnimator;
 import android.app.Activity;
 import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
-import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
@@ -35,16 +26,12 @@ public class FeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> i
 
     private List<PhotoShot> items;
     private final Activity host;
-    @Nullable
-    private final DataLoadingSubject dataLoading;
     private final LayoutInflater layoutInflater;
     private final ColorDrawable[] shotLoadingPlaceholders;
-    private boolean showLoadingMore = false;
 
 
     public FeedAdapter(Activity hostActivity, DataLoadingSubject dataLoading) {
         this.host = hostActivity;
-        this.dataLoading = dataLoading;
         dataLoading.registerCallback(this);
         layoutInflater = LayoutInflater.from(host);
         items = new ArrayList<>();
@@ -81,7 +68,6 @@ public class FeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> i
                                                }
                                            }
         );
-        //TODO Custom ImageView with proper image ratio and badge color
         return holder;
     }
 
@@ -91,8 +77,6 @@ public class FeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> i
     }
 
     private void bindFliprShotHolder(final PhotoShot photoShot, final FliprShotViewHolder holder, int position) {
-
-        // Description api : ??
         // holder.title.setText(photoShot.title);
         holder.title.setText("");
         holder.description.setText(photoShot.description);
@@ -117,15 +101,10 @@ public class FeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> i
 
     @Override
     public void dataStartedLoading() {
-        notifyItemInserted(getLoadingMoreItemPosition());
     }
 
     @Override
     public void dataFinishedLoading() {
-        if (!showLoadingMore) return;
-        final int loadingPos = getLoadingMoreItemPosition();
-        showLoadingMore = false;
-        notifyItemRemoved(loadingPos);
     }
 
     @Override
@@ -133,9 +112,6 @@ public class FeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> i
         return getItem(position).id;
     }
 
-    private int getLoadingMoreItemPosition() {
-        return showLoadingMore ? getItemCount() - 1 : RecyclerView.NO_POSITION;
-    }
 
     static class FliprShotViewHolder extends RecyclerView.ViewHolder {
 

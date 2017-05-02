@@ -1,6 +1,7 @@
 package com.vixir.flipr.data;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.vixir.flipr.BuildConfig;
 import com.vixir.flipr.data.api.model.Photo;
@@ -11,6 +12,7 @@ import com.vixir.flipr.data.api.model.Size;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -23,16 +25,13 @@ public abstract class DataManager extends BaseDataManager<List<? extends PhotoSh
         super(context);
     }
 
-    int count = 0;
-
-
     public void loadDataSource() {
-        final Call<PhotoPage> topPics = getFliprApi().getPhotosFeed(BuildConfig.FLICKR_API_KEY, BuildConfig.DEFAULT_PIC_TAG, "20");
+        loadStarted();
+        final Call<PhotoPage> topPics = getFliprApi().getPhotosFeed(BuildConfig.FLICKR_API_KEY, BuildConfig.DEFAULT_PIC_TAG, "23");
         topPics.enqueue(new Callback<PhotoPage>() {
             @Override
             public void onResponse(Call<PhotoPage> call, Response<PhotoPage> response) {
                 if (response.isSuccessful()) {
-                    count = 0;
                     if (response.body().getStat().equals("fail")) {
                         loadFailed("response not successful");
                     } else {
@@ -49,6 +48,7 @@ public abstract class DataManager extends BaseDataManager<List<? extends PhotoSh
             }
         });
     }
+
 
     private void loadPhotos(PhotoPage body) {
         Photos photos = body.getPhotos();
@@ -99,11 +99,6 @@ public abstract class DataManager extends BaseDataManager<List<? extends PhotoSh
 
     private void loadFailed(String key) {
         loadFinished();
-    }
-
-    @Override
-    public void cancelLoading() {
-
     }
 
 

@@ -5,7 +5,6 @@ import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.support.annotation.NonNull;
 import android.support.v4.util.ArrayMap;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -16,6 +15,9 @@ import android.view.animation.DecelerateInterpolator;
 import android.widget.ImageView;
 
 import java.util.List;
+
+/*
+from : https://www.thedroidsonroids.com/blog/android/android-flipa-card-animation-exlpained/ */
 
 public class MyFlipAnimator extends DefaultItemAnimator {
     private AccelerateInterpolator mAccelerateInterpolator = new AccelerateInterpolator();

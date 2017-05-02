@@ -1,7 +1,6 @@
 package com.vixir.flipr.data;
 
 public interface DataLoadingSubject {
-    boolean isDataLoading();
 
     void registerCallback(DataLoadingCallbacks callbacks);
 

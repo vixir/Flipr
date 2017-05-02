@@ -7,9 +7,6 @@ import com.google.gson.Gson;
 import com.vixir.flipr.data.api.client.ApiClient;
 import com.vixir.flipr.data.api.rest.ApiInterface;
 
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
-
 
 public abstract class BaseDataManager<T> implements DataLoadingSubject {
 
@@ -19,14 +16,7 @@ public abstract class BaseDataManager<T> implements DataLoadingSubject {
     public BaseDataManager(@NonNull Context context) {
     }
 
-    @Override
-    public boolean isDataLoading() {
-        return false;
-    }
-
     public abstract void onDataLoaded(T data);
-
-    public abstract void cancelLoading();
 
     @Override
     public void registerCallback(DataLoadingCallbacks callbacks) {
