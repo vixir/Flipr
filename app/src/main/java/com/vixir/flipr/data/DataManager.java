@@ -12,7 +12,6 @@ import com.vixir.flipr.data.api.model.Size;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -25,9 +24,18 @@ public abstract class DataManager extends BaseDataManager<List<? extends PhotoSh
         super(context);
     }
 
-    public void loadDataSource() {
+    public void loadDataSource(int page) {
         loadStarted();
-        final Call<PhotoPage> topPics = getFliprApi().getPhotosFeed(BuildConfig.FLICKR_API_KEY, BuildConfig.DEFAULT_PIC_TAG, "23");
+    /*
+            REMEMBER THIS IN CAPITAL LETTERS
+        1. First, clear the array of data
+            listOfItems.clear();
+        2. Notify the adapter of the update
+            recyclerAdapterOfItems.notifyDataSetChanged(); // or notifyItemRangeRemoved
+        3. Reset endless scroll listener when performing a new search
+            scrollListener.resetState();
+     */
+        final Call<PhotoPage> topPics = getFliprApi().getPhotosFeed(BuildConfig.FLICKR_API_KEY, BuildConfig.DEFAULT_PIC_TAG, page + "");
         topPics.enqueue(new Callback<PhotoPage>() {
             @Override
             public void onResponse(Call<PhotoPage> call, Response<PhotoPage> response) {

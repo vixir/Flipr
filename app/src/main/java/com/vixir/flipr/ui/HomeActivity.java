@@ -21,12 +21,12 @@ import android.view.WindowInsets;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
-import android.widget.TextView;
 import android.widget.Toolbar;
 
 import com.vixir.flipr.R;
 import com.vixir.flipr.data.DataManager;
 import com.vixir.flipr.data.PhotoShot;
+import com.vixir.flipr.ui.RecyclerView.EndlessRecyclerViewScrollListener;
 
 import java.util.List;
 
@@ -57,6 +57,7 @@ public class HomeActivity extends Activity {
     FeedAdapter adapter;
     DataManager dataManager;
     private MyFlipAnimator mChangeAnimator = new MyFlipAnimator();
+    private EndlessRecyclerViewScrollListener mScrollListener;
 
 
     @Override
@@ -80,6 +81,17 @@ public class HomeActivity extends Activity {
         grid.addItemDecoration(new SimpleDividerItemDecoration(8, 8));
         grid.setHasFixedSize(true);
         grid.setAdapter(adapter);
+
+        mScrollListener = new EndlessRecyclerViewScrollListener(layoutManager) {
+            @Override
+            public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
+                // Triggered only when new data needs to be appended to the list
+                // Add whatever code is needed to append new items to the bottom of the list
+                dataManager.loadDataSource(page);
+            }
+        };
+
+        grid.addOnScrollListener(mScrollListener);
         // drawer layout treats fitsSystemWindows specially so we have to handle insets ourselves
         drawer.setOnApplyWindowInsetsListener(new View.OnApplyWindowInsetsListener() {
             @Override
@@ -106,11 +118,10 @@ public class HomeActivity extends Activity {
                 lpStatus.height = insets.getSystemWindowInsetTop();
                 statusBarBackground.setLayoutParams(lpStatus);
                 drawer.setOnApplyWindowInsetsListener(null);
-
                 return insets.consumeSystemWindowInsets();
             }
         });
-        dataManager.loadDataSource();
+        dataManager.loadDataSource(0);
         checkEmptyState();
 
     }
@@ -178,7 +189,7 @@ public class HomeActivity extends Activity {
                     TransitionManager.beginDelayedTransition(drawer);
                     noConnection.setVisibility(View.GONE);
                     loading.setVisibility(View.VISIBLE);
-                    dataManager.loadDataSource();
+                    dataManager.loadDataSource(0);
                 }
             });
         }
