@@ -5,6 +5,12 @@
     android:layout_height="wrap_content"
     tools:context=".ui.HomeActivity">
 
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="right"
+        android:layout_margin="@dimen/bookmark_border" />
+
     <FrameLayout
         android:id="@+id/card_back"
         android:layout_width="match_parent"

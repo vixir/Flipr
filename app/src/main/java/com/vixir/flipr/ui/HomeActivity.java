@@ -1,7 +1,9 @@
 package com.vixir.flipr.ui;
 
 import android.app.Activity;
+import android.app.SearchManager;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.drawable.AnimatedVectorDrawable;
 import android.net.ConnectivityManager;
 import android.net.Network;
@@ -14,6 +16,8 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.transition.TransitionManager;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewStub;
@@ -35,6 +39,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 public class HomeActivity extends Activity {
+    private static final int RC_SEARCH = 1;
     @BindView(R.id.drawer)
     DrawerLayout drawer;
     @BindView(R.id.toolbar)
@@ -59,6 +64,22 @@ public class HomeActivity extends Activity {
     private MyFlipAnimator mChangeAnimator = new MyFlipAnimator();
     private EndlessRecyclerViewScrollListener mScrollListener;
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menu_search:
+                View searchMenuView = toolbar.findViewById(R.id.menu_search);
+                startActivityForResult(new Intent(this, SearchActivity.class), RC_SEARCH);
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -104,7 +125,6 @@ public class HomeActivity extends Activity {
                 lpToolbar.rightMargin += insets.getSystemWindowInsetRight();
                 toolbar.setLayoutParams(lpToolbar);
 
-                // inset the grid top by statusbar+toolbar & the bottom by the navbar (don't clip)
                 grid.setPadding(
                         0,
                         insets.getSystemWindowInsetTop()
@@ -146,7 +166,9 @@ public class HomeActivity extends Activity {
     private void checkEmptyState() {
         if (adapter.getDataItemCount() == 0) {
             loading.setVisibility(View.VISIBLE);
+            grid.setVisibility(View.INVISIBLE);
         } else {
+            grid.setVisibility(View.VISIBLE);
             loading.setVisibility(View.GONE);
         }
     }

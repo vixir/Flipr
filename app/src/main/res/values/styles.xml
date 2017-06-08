@@ -50,6 +50,21 @@
         <item name="android:theme">@android:style/ThemeOverlay.Material.Dark</item>
     </style>
 
+    <style name="Flipr.Translucent">
+        <item name="android:windowBackground">@color/scrim</item>
+        <item name="android:colorBackgroundCacheHint">@null</item>
+        <item name="android:textColorHint">@android:color/darker_gray</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowIsFloating">false</item>
+        <item name="searchHintIcon">@null</item>
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
+        <item name="android:statusBarColor">@color/background_super_dark</item>
+        <item name="android:navigationBarColor">@color/background_super_dark</item>
+        <item name="android:editTextColor">@android:color/white</item>
+    </style>
+
     <style name="TextAppearance.ToolbarTitleSmallCaps" parent="@android:style/TextAppearance.Material.Widget.ActionBar.Title">
         <item name="android:textColor">@color/text_primary_light</item>
         <item name="android:fontFeatureSettings">smcp</item>

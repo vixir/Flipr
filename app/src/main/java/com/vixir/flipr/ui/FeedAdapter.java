@@ -5,9 +5,11 @@ import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
@@ -28,7 +30,9 @@ public class FeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> i
     private final Activity host;
     private final LayoutInflater layoutInflater;
     private final ColorDrawable[] shotLoadingPlaceholders;
-
+    private final int VIEW_TYPE_ITEM = 1;
+    private final int VIEW_TYPE_LOADING = -1;
+    private boolean showLoadingMore = false;
 
     public FeedAdapter(Activity hostActivity, DataLoadingSubject dataLoading) {
         this.host = hostActivity;
@@ -52,18 +56,36 @@ public class FeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> i
 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        return createFliprShotViewHolder(parent);
+        if (viewType == VIEW_TYPE_ITEM) {
+            return createFliprShotViewHolder(parent);
+        } else if (viewType == VIEW_TYPE_LOADING) {
+            Log.e("FeedAdapter", "VIEW_TYPE_LOADING");
+            View view = LayoutInflater.from(host).inflate(R.layout.infinite_loading, parent, false);
+            return new LoadingViewHolder(view);
+        }
+        return null;
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        if (position < getDataItemCount() && getDataItemCount() > 0) {
+            return VIEW_TYPE_ITEM;
+        }
+        return VIEW_TYPE_LOADING;
     }
 
     private FliprShotViewHolder createFliprShotViewHolder(ViewGroup parent) {
         final FliprShotViewHolder holder = new FliprShotViewHolder(layoutInflater.inflate(R.layout.main_item, parent, false));
+
         holder.itemView.setOnClickListener(new View.OnClickListener() {
                                                @Override
                                                public void onClick(final View v) {
                                                    //TODO change background based on image color palette
-                                                   int position = ((HomeActivity) host).grid.getChildAdapterPosition(v);
-                                                   if (position != RecyclerView.NO_POSITION) {
-                                                       notifyItemChanged(position);
+                                                   if (host instanceof HomeActivity) {
+                                                       int position = ((HomeActivity) host).grid.getChildAdapterPosition(v);
+                                                       if (position !=  RecyclerView.NO_POSITION) {
+                                                           notifyItemChanged(position);
+                                                       }
                                                    }
                                                }
                                            }
@@ -73,7 +95,12 @@ public class FeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> i
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-        bindFliprShotHolder((PhotoShot) getItem(position), (FliprShotViewHolder) holder, position);
+        if (holder instanceof FliprShotViewHolder) {
+            bindFliprShotHolder((PhotoShot) getItem(position), (FliprShotViewHolder) holder, position);
+        } else if (holder instanceof LoadingViewHolder) {
+            LoadingViewHolder loadingViewHolder = (LoadingViewHolder) holder;
+            loadingViewHolder.progressBar.setIndeterminate(true);
+        }
     }
 
     private void bindFliprShotHolder(final PhotoShot photoShot, final FliprShotViewHolder holder, int position) {
@@ -96,26 +123,35 @@ public class FeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> i
 
     @Override
     public int getItemCount() {
-        return items.size();
+        return getDataItemCount() + (showLoadingMore ? 1 : 0);
     }
 
     @Override
     public void dataStartedLoading() {
+        if (showLoadingMore) return;
+        showLoadingMore = true;
+        notifyItemInserted(getLoadingMoreItemPosition());
     }
 
     @Override
     public void dataFinishedLoading() {
+        if (!showLoadingMore) return;
+        final int loadingPos = getLoadingMoreItemPosition();
+        showLoadingMore = false;
+        notifyItemRemoved(loadingPos);
     }
 
     @Override
     public long getItemId(int position) {
+        if (getItemViewType(position) == VIEW_TYPE_LOADING) {
+            return -1L;
+        }
         return getItem(position).id;
     }
 
 
     static class FliprShotViewHolder extends RecyclerView.ViewHolder {
 
-        //TODO convert it to a particular ratio image view? 600x600 or 4:3
         @BindView(R.id.shot)
         ThreeFourImageView image;
         @BindView(R.id.title_metadata)
@@ -124,6 +160,7 @@ public class FeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> i
         TextView description;
         @BindView(R.id.dimen_metadata)
         TextView dimen;
+
         View mCardFrontLayout;
         View mCardBackLayout;
         boolean isBackVisible = false;
@@ -146,12 +183,25 @@ public class FeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> i
 
 
     public int getDataItemCount() {
-        return items.size();
+        return items.size() + (showLoadingMore ? 0 : 1);
+    }
+
+    private int getLoadingMoreItemPosition() {
+        return showLoadingMore ? getItemCount() - 1 : RecyclerView.NO_POSITION;
     }
 
     private void add(List<? extends PhotoShot> newItems) {
         for (PhotoShot newItem : newItems) {
             items.add(newItem);
+        }
+    }
+
+    static class LoadingViewHolder extends RecyclerView.ViewHolder {
+        public ProgressBar progressBar;
+
+        public LoadingViewHolder(View itemView) {
+            super(itemView);
+            progressBar = (ProgressBar) itemView.findViewById(R.id.progressBar1);
         }
     }
 }
